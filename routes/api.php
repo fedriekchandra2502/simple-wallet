@@ -21,5 +21,6 @@ Route::prefix('v1')->group(function() {
         Route::post('wallet', [Controllers\WalletController::class, 'enableWallet']);
         Route::get('wallet', [Controllers\WalletController::class, 'show']);
         Route::post('wallet/deposit', [Controllers\WalletController::class, 'deposit']);
+        Route::post('wallet/withdrawals', [Controllers\WalletController::class, 'withdraw']);
     });
 });
