@@ -10,7 +10,7 @@ class UserController extends Controller
     public function init()
     {
         $data = request()->validate([
-            'customer_xid' => ['required','uuid']
+            'customer_xid' => ['required']
         ]);
 
         $user = User::query()->firstOrCreate([
