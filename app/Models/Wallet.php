@@ -26,4 +26,14 @@ class Wallet extends Model
     {
         return $this->belongsTo(User::class, 'owned_by');
     }
+
+    public function getIncrementing()
+    {
+        return false;
+    }
+
+    public function getKeyType()
+    {
+        return 'string';
+    }
 }

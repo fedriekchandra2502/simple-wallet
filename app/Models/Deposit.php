@@ -26,4 +26,14 @@ class Deposit extends Model
     {
         return $this->belongsTo(User::class, 'deposited_by');
     }
+
+    public function getIncrementing()
+    {
+        return false;
+    }
+
+    public function getKeyType()
+    {
+        return 'string';
+    }
 }

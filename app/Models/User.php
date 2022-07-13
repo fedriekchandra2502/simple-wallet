@@ -46,10 +46,21 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'id' => 'string'
     ];
+    
     public $incrementing = false;
 
     public function wallet()
     {
         return $this->hasOne(Wallet::class,'owned_by');
+    }
+
+    public function getIncrementing()
+    {
+        return false;
+    }
+
+    public function getKeyType()
+    {
+        return 'string';
     }
 }

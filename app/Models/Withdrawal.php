@@ -26,4 +26,14 @@ class Withdrawal extends Model
     {
         return $this->belongsTo(User::class, 'withdrawn_by');
     }
+
+    public function getIncrementing()
+    {
+        return false;
+    }
+
+    public function getKeyType()
+    {
+        return 'string';
+    }
 }
