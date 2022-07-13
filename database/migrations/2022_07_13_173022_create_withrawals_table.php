@@ -13,7 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('withrawals', function (Blueprint $table) {
+        Schema::create('withdrawals', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('withdrawn_by')->references('id')->on('users');
             $table->string('status');
@@ -31,6 +31,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('withrawals');
+        Schema::dropIfExists('withdrawals');
     }
 };
