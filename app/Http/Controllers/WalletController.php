@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Wallet;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -17,7 +18,7 @@ class WalletController extends Controller
             if($wallet->status == 'enabled') {
 
                 $resp = apiResp(['status' => 'wallet already has been enabled'],'fail');
-                
+
                 return response()->json($resp,400);
 
             } else {
@@ -37,6 +38,16 @@ class WalletController extends Controller
         
         $resp = apiResp(compact('wallet'));
 
+        return response()->json($resp);
+    }
+
+    public function show()
+    {
+        $user = auth()->user();
+        $wallet = $user->wallet()
+                ->select(['id','owned_by','status','enabled_at','balance'])->get();
+
+        $resp = apiResp(compact('wallet'));
         return response()->json($resp);
     }
 }

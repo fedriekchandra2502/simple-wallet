@@ -11,6 +11,9 @@ class Withdrawal extends Model
     use HasFactory;
 
     protected $guarded = ['id'];
+    protected $casts = [
+        'id' => 'string'
+    ];
 
     protected static function booted()
     {
