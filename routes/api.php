@@ -17,5 +17,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function() {
     Route::post('init', [Controllers\UserController::class, 'init']);
-    
+    Route::middleware('auth:sanctum')->group(function() {
+        Route::post('wallet', [Controllers\WalletController::class, 'enableWallet']);
+    });
 });

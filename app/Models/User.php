@@ -15,9 +15,9 @@ class User extends Authenticatable
 
     protected static function booted()
     {
-        static::creating(function($model) {
-            $model->id = Str::uuid();
-        });
+        // static::creating(function($model) {
+        //     $model->id = Str::uuid();
+        // });
     }
 
     /**
@@ -25,11 +25,7 @@ class User extends Authenticatable
      *
      * @var array<int, string>
      */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-    ];
+    protected $guarded = [];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -48,7 +44,9 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'id' => 'string'
     ];
+    public $incrementing = false;
 
     public function wallet()
     {
