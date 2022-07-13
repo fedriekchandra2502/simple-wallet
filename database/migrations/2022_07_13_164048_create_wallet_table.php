@@ -20,6 +20,7 @@ return new class extends Migration
             $table->unsignedBigInteger('balance')->default(0);
             $table->timestamp('enabled_at')->nullable();
             $table->timestamp('disabled_at')->nullable();
+            $table->timestamps();
         });
     }
 

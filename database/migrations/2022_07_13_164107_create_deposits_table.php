@@ -20,6 +20,7 @@ return new class extends Migration
             $table->unsignedBigInteger('amount');
             $table->uuid('reference_id')->unique();
             $table->timestamp('deposited_at')->nullable();
+            $table->timestamps();
         });
     }
 
