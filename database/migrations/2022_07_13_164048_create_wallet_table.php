@@ -17,9 +17,9 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->foreignUuid('owned_by')->references('id')->on('users');
             $table->string('status');
-            $table->unsignedBigInteger('balance');
-            $table->timestamp('enabled_at');
-            $table->timestamp('disabled_at');
+            $table->unsignedBigInteger('balance')->default(0);
+            $table->timestamp('enabled_at')->nullable();
+            $table->timestamp('disabled_at')->nullable();
         });
     }
 

@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('status');
             $table->unsignedBigInteger('amount');
             $table->uuid('reference_id')->unique();
-            $table->timestamp('withdrawn_at');
+            $table->timestamp('withdrawn_at')->nullable();
         });
     }
 
