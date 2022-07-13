@@ -19,7 +19,7 @@ class Withdrawal extends Model
         });
     }
 
-    public function user()
+    public function by()
     {
         return $this->belongsTo(User::class, 'withdrawn_by');
     }

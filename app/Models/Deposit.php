@@ -19,7 +19,7 @@ class Deposit extends Model
         });
     }
 
-    public function user()
+    public function by()
     {
         return $this->belongsTo(User::class, 'deposited_by');
     }
