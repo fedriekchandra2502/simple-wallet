@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Deposit;
 use App\Models\Wallet;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class WalletController extends Controller
 {
@@ -48,6 +51,37 @@ class WalletController extends Controller
                 ->select(['id','owned_by','status','enabled_at','balance'])->get();
 
         $resp = apiResp(compact('wallet'));
+        return response()->json($resp);
+    }
+
+    public function deposit()
+    {
+        $data = request()->validate([
+            'amount' => ['required','integer'],
+            'reference_id' => ['required', Rule::unique('deposits','reference_id')]
+        ]);
+        $user = auth()->user();
+        $deposit = Deposit::create([
+            'deposited_by' => $user->id,
+            'status' => 'success',
+            'amount' => $data['amount'],
+            'reference_id' => $data['reference_id'],
+            'deposited_at' => Carbon::now()
+        ]);
+        
+        DB::beginTransaction();
+        try {
+            $wallet = $user->wallet;
+            $wallet->balance = $wallet->balance + $data['amount'];
+            $wallet->save();
+            DB::commit();
+        } catch(\Exception $e) {
+            DB::rollBack();
+            $deposit->status = 'failed';
+            $deposit->save();
+        }
+        
+        $resp = apiResp(compact('deposit'));
         return response()->json($resp);
     }
 }
