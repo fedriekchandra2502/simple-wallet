@@ -13,10 +13,13 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('users', function (Blueprint $table) {
+        Schema::create('deposits', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->rememberToken();
-            $table->timestamps();
+            $table->foreignUuid('deposited_by')->references('id')->on('users');
+            $table->string('status');
+            $table->unsignedBigInteger('amount');
+            $table->uuid('reference_id')->unique();
+            $table->timestamp('deposited_at');
         });
     }
 
@@ -27,6 +30,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('deposits');
     }
 };
