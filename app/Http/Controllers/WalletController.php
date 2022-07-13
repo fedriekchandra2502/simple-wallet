@@ -124,4 +124,23 @@ class WalletController extends Controller
         $resp = apiResp(compact('withdraw'));
         return response()->json($resp);
     }
+
+    public function disableWallet()
+    {
+        $data = request()->validate([
+            'is_disabled' => ['required','boolean']
+        ]);
+
+        $user = auth()->user();
+        $wallet = $user->wallet;
+
+        if($data['is_disabled']) {
+            $wallet->status = 'disabled';
+            $wallet->disabled_at = Carbon::now();
+            $wallet->save();
+        }
+
+        $resp = apiResp(compact('wallet'));
+        return response()->json($resp);
+    }
 }
