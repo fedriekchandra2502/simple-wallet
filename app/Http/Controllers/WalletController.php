@@ -2,12 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\DepositJob;
+use App\Jobs\WithdrawJob;
 use App\Models\Deposit;
 use App\Models\Wallet;
 use App\Models\Withdrawal;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 
 class WalletController extends Controller
@@ -49,7 +50,12 @@ class WalletController extends Controller
     {
         $user = auth()->user();
         $wallet = $user->wallet()
-                ->select(['id','owned_by','status','enabled_at','balance'])->get();
+                ->select(['id','owned_by','status','enabled_at','balance'])->first();
+        
+        if($wallet->status == 'disabled') {
+            $resp = apiResp(['error' => 'this wallet is disabled'],'fail');
+            return response()->json($resp, 400);
+        }
 
         $resp = apiResp(compact('wallet'));
         return response()->json($resp);
@@ -62,25 +68,22 @@ class WalletController extends Controller
             'reference_id' => ['required', Rule::unique('deposits','reference_id')]
         ]);
         $user = auth()->user();
+        $wallet = $user->wallet;
+
+        if($wallet->status == 'disabled') {
+            $resp = apiResp(['error' => 'this wallet is disabled'],'fail');
+            return response()->json($resp, 400);
+        }
+
         $deposit = Deposit::create([
             'deposited_by' => $user->id,
-            'status' => 'success',
+            'status' => 'pending',
             'amount' => $data['amount'],
             'reference_id' => $data['reference_id'],
             'deposited_at' => Carbon::now()
         ]);
-        
-        DB::beginTransaction();
-        try {
-            $wallet = $user->wallet;
-            $wallet->balance = $wallet->balance + $data['amount'];
-            $wallet->save();
-            DB::commit();
-        } catch(\Exception $e) {
-            DB::rollBack();
-            $deposit->status = 'failed';
-            $deposit->save();
-        }
+
+        dispatch(new DepositJob($deposit, $wallet))->delay(now()->addSeconds(10));
         
         $resp = apiResp(compact('deposit'));
         return response()->json($resp);
@@ -96,30 +99,25 @@ class WalletController extends Controller
         $user = auth()->user();
         $wallet = $user->wallet;
 
-        $withdrawalStatus = 'success';
+        if($wallet->status == 'disabled') {
+            $resp = apiResp(['error' => 'this wallet is disabled'],'fail');
+            return response()->json($resp, 400);
+        }
 
         if($wallet->balance < $data['amount']) {
-            $withdrawalStatus = 'failed';
+            $resp = apiResp(['error' => 'withdrawal amount exceeding wallet balance'], 'fail');
+            return response()->json($resp, 400);
         }
 
         $withdraw = Withdrawal::create([
             'withdrawn_by' => $user->id,
-            'status' => $withdrawalStatus,
+            'status' => 'pending',
             'amount' => $data['amount'],
             'reference_id' => $data['reference_id'],
             'withdrawn_at' => Carbon::now()
         ]);
 
-        DB::beginTransaction();
-        try {
-            $wallet->balance = $wallet->balance - $data['amount'];
-            $wallet->save();
-            DB::commit();
-        } catch(\Exception $e) {
-            DB::rollBack();
-            $withdraw->status = 'failed';
-            $withdraw->save();
-        }
+        dispatch(new WithdrawJob($withdraw, $wallet))->delay(now()->addSeconds(5));
 
         $resp = apiResp(compact('withdraw'));
         return response()->json($resp);
