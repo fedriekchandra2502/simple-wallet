@@ -83,7 +83,7 @@ class WalletController extends Controller
             'deposited_at' => Carbon::now()
         ]);
 
-        dispatch(new DepositJob($deposit, $wallet))->delay(now()->addSeconds(10));
+        dispatch(new DepositJob($deposit, $wallet))->delay(now()->addSeconds(5));
         
         $resp = apiResp(compact('deposit'));
         return response()->json($resp);
